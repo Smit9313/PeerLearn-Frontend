@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import Layout from "../components/layout/Layout";
+import DashboardLayout from "../components/layout/DashboardLayout";
 import { useAuth } from '../hooks/useAuth';
 
 // Lazy loaded pages
@@ -19,7 +20,7 @@ const Settings = lazy(() => import("../pages/Settings"));
 
 const PublicRoutes = () => {
   const { isAuthenticated } = useAuth();
-  
+
   // Only render public routes if the user is not authenticated
   return (
     !isAuthenticated && (
@@ -41,19 +42,21 @@ const ProtectedRoutes = () => {
   // Redirect unauthenticated users to login
   return (
     isAuthenticated && (
-      <Routes>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/:userId" element={<Profile />} />
-          <Route path="/skills" element={<SkillMatching />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/sessions/*" element={<SessionManagement />} />
-          <Route path="/favor-bank" element={<FavorBank />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+      <DashboardLayout>
+        <Routes>
+          {/* <Route element={<ProtectedRoute />}> */}
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/skills" element={<SkillMatching />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/sessions/*" element={<SessionManagement />} />
+            <Route path="/favor-bank" element={<FavorBank />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          {/* </Route> */}
+        </Routes>
+      </DashboardLayout>
     )
   );
 };
