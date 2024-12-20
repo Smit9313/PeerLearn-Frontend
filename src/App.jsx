@@ -1,11 +1,19 @@
-import React from 'react'
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import AppRoutes from './routes';
+import Layout from './components/layout/Layout';
 
-const App = () => {
+function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  )
+    <Provider store={store}>
+      <Router>
+        <Layout>
+          <AppRoutes />
+        </Layout>
+      </Router>
+    </Provider>
+  );
 }
 
-export default App
+export default App;
