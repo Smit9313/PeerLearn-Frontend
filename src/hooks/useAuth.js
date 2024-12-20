@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { setCredentials } from "../store/slices/authSlice";
+import { setCredentials, logout } from "../store/slices/authSlice";
 
 export const useAuth = () => {
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -9,9 +9,14 @@ export const useAuth = () => {
     dispatch(setCredentials(userData));
   };
 
+  const userLogout = () => {
+    dispatch(logout());
+  };
+
   return {
     user,
     userLogin,
+    userLogout,
     isAuthenticated,
     loading,
   };
