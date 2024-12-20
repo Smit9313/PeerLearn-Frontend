@@ -1,4 +1,3 @@
-// src/pages/SkillExchange/index.jsx
 import { useState } from 'react';
 import {
 	Search,
@@ -246,6 +245,7 @@ const SkillMatching = () => {
 					</Button>
 				</div>
 			}
+			className="p-4"
 		>
 			<div className="flex space-x-6">
 				{/* Filters Sidebar */}

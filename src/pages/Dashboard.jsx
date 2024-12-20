@@ -86,6 +86,7 @@ const Dashboard = () => {
           New Session
         </Button>
       }
+      className="p-4"
     >
       <div className="space-y-6">
         {/* Stats Grid */}

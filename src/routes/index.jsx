@@ -14,7 +14,7 @@ const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Profile = lazy(() => import("../pages/Profile"));
 const SkillMatching = lazy(() => import("../pages/SkillMatching"));
 const Messages = lazy(() => import("../pages/Messages"));
-const SessionManagement = lazy(() => import("../pages/SessionManagement"));
+const Sessions = lazy(() => import("../pages/Sessions"));
 const FavorBank = lazy(() => import("../pages/FavorBank"));
 const Settings = lazy(() => import("../pages/Settings"));
 
@@ -50,7 +50,7 @@ const ProtectedRoutes = () => {
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/skills" element={<SkillMatching />} />
             <Route path="/messages" element={<Messages />} />
-            <Route path="/sessions/*" element={<SessionManagement />} />
+            <Route path="/sessions/*" element={<Sessions />} />
             <Route path="/favor-bank" element={<FavorBank />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />
