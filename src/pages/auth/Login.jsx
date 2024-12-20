@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/common/Button';
+import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
+	const { userLogin } = useAuth();
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -21,6 +23,7 @@ const Login = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle login logic
+		userLogin(formData);
 		console.log('Form submitted:', formData);
 	};
 
