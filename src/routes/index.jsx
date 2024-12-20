@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectedRoute from "./ProtectedRoute";
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import Layout from "../components/layout/Layout";
+import { useAuth } from '../hooks/useAuth';
 
 // Lazy loaded pages
 const Landing = lazy(() => import("../pages/Landing"));
@@ -14,21 +16,34 @@ const Messages = lazy(() => import("../pages/Messages"));
 const SessionManagement = lazy(() => import("../pages/SessionManagement"));
 const FavorBank = lazy(() => import("../pages/FavorBank"));
 const Settings = lazy(() => import("../pages/Settings"));
-// const Help = lazy(() => import("../pages/Help"));
 
-const AppRoutes = () => {
+const PublicRoutes = () => {
+  const { isAuthenticated } = useAuth();
+  
+  // Only render public routes if the user is not authenticated
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        {/* <Route path="/help" element={<Help />} /> */}
+    !isAuthenticated && (
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
+    )
+  );
+};
 
-        {/* Protected Routes */}
+const ProtectedRoutes = () => {
+  const { isAuthenticated } = useAuth();
+
+  // Redirect unauthenticated users to login
+  return (
+    isAuthenticated && (
+      <Routes>
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/skills" element={<SkillMatching />} />
@@ -36,11 +51,18 @@ const AppRoutes = () => {
           <Route path="/sessions/*" element={<SessionManagement />} />
           <Route path="/favor-bank" element={<FavorBank />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
-
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    )
+  );
+};
+
+const AppRoutes = () => {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <PublicRoutes />
+      <ProtectedRoutes />
     </Suspense>
   );
 };
