@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Search,
 	Filter,
@@ -15,8 +15,10 @@ import {
 } from 'lucide-react';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
+import { useUser } from '../hooks/useUser';
 
 const SkillMatching = () => {
+	const { getUsers, users } = useUser();
 	const [selectedFilters, setSelectedFilters] = useState({
 		skillCategories: [],
 		availability: [],
@@ -34,6 +36,12 @@ const SkillMatching = () => {
 		duration: '60',
 		notes: ''
 	});
+
+	useEffect(() => {
+		getUsers();
+	}, []);
+
+	console.log("users", users);
 
 	// Sample data
 	const skillCategories = [
@@ -66,147 +74,36 @@ const SkillMatching = () => {
 		{ id: 'zh', name: 'Mandarin' },
 	];
 
-	// Sample search results
-	const searchResults = [
-		{
-			id: 1,
-			name: 'Sarah Wilson',
-			avatar: '/avatar1.jpg',
-			university: 'Stanford University',
-			matchPercentage: 95,
-			skills: [
-				{ name: 'Python Programming', level: 'Advanced', rating: 4.9 },
-				{ name: 'Data Science', level: 'Intermediate', rating: 4.7 },
-			],
-			availability: ['Morning', 'Evening'],
-			languages: ['English', 'Spanish'],
-			location: 'California, USA',
-			rating: 4.9,
-			totalReviews: 48,
-			teachingHours: 156,
-		},
-		{
-			id: 2,
-			name: 'Mark Taylor',
-			avatar: '/avatar2.jpg',
-			university: 'MIT',
-			matchPercentage: 90,
-			skills: [
-				{ name: 'Web Development', level: 'Advanced', rating: 4.8 },
-				{ name: 'ReactJS', level: 'Advanced', rating: 4.9 },
-				{ name: 'Node.js', level: 'Intermediate', rating: 4.5 },
-			],
-			availability: ['Afternoon', 'Evening'],
-			languages: ['English'],
-			location: 'Massachusetts, USA',
-			rating: 4.8,
-			totalReviews: 35,
-			teachingHours: 112,
-		},
-		{
-			id: 3,
-			name: 'Emily Johnson',
-			avatar: '/avatar3.jpg',
-			university: 'Harvard University',
-			matchPercentage: 93,
-			skills: [
-				{ name: 'Artificial Intelligence', level: 'Advanced', rating: 4.7 },
-				{ name: 'Machine Learning', level: 'Advanced', rating: 4.8 },
-			],
-			availability: ['Morning', 'Night'],
-			languages: ['English', 'French'],
-			location: 'Boston, USA',
-			rating: 4.8,
-			totalReviews: 42,
-			teachingHours: 145,
-		},
-		{
-			id: 4,
-			name: 'Michael Brown',
-			avatar: '/avatar4.jpg',
-			university: 'UC Berkeley',
-			matchPercentage: 88,
-			skills: [
-				{ name: 'Cybersecurity', level: 'Intermediate', rating: 4.6 },
-				{ name: 'Networking', level: 'Advanced', rating: 4.5 },
-			],
-			availability: ['Morning', 'Afternoon'],
-			languages: ['English', 'German'],
-			location: 'California, USA',
-			rating: 4.6,
-			totalReviews: 27,
-			teachingHours: 98,
-		},
-		{
-			id: 5,
-			name: 'Sophia Martinez',
-			avatar: '/avatar5.jpg',
-			university: 'University of Toronto',
-			matchPercentage: 92,
-			skills: [
-				{ name: 'Mobile App Development', level: 'Advanced', rating: 4.8 },
-				{ name: 'React Native', level: 'Advanced', rating: 4.9 },
-			],
-			availability: ['Evening'],
-			languages: ['English', 'Spanish'],
-			location: 'Toronto, Canada',
-			rating: 4.8,
-			totalReviews: 38,
-			teachingHours: 123,
-		},
-		{
-			id: 6,
-			name: 'Olivia White',
-			avatar: '/avatar6.jpg',
-			university: 'University of Oxford',
-			matchPercentage: 94,
-			skills: [
-				{ name: 'Artificial Intelligence', level: 'Expert', rating: 4.9 },
-				{ name: 'Data Visualization', level: 'Advanced', rating: 4.7 },
-			],
-			availability: ['Morning', 'Evening'],
-			languages: ['English'],
-			location: 'London, UK',
-			rating: 4.9,
-			totalReviews: 50,
-			teachingHours: 180,
-		},
-		{
-			id: 7,
-			name: 'James Lopez',
-			avatar: '/avatar7.jpg',
-			university: 'Carnegie Mellon University',
-			matchPercentage: 89,
-			skills: [
-				{ name: 'Database Management', level: 'Intermediate', rating: 4.5 },
-				{ name: 'SQL', level: 'Advanced', rating: 4.6 },
-			],
-			availability: ['Afternoon'],
-			languages: ['English'],
-			location: 'Pittsburgh, USA',
-			rating: 4.5,
-			totalReviews: 30,
-			teachingHours: 102,
-		},
-		{
-			id: 8,
-			name: 'Daniel Rodriguez',
-			avatar: '/avatar8.jpg',
-			university: 'Georgia Tech',
-			matchPercentage: 91,
-			skills: [
-				{ name: 'DevOps', level: 'Advanced', rating: 4.8 },
-				{ name: 'Cloud Computing', level: 'Expert', rating: 4.9 },
-			],
-			availability: ['Morning', 'Night'],
-			languages: ['English', 'Portuguese'],
-			location: 'Atlanta, USA',
-			rating: 4.8,
-			totalReviews: 40,
-			teachingHours: 135,
-		},
-	];
+	// Transform API user data to match the display format
+	const transformUserData = (user) => ({
+		id: user.id,
+		name: `${user.profile.firstName} ${user.profile.lastName}`,
+		avatar: user.profile.avatar,
+		university: user.academic.university,
+		matchPercentage: 95, // You might want to calculate this based on some criteria
+		skills: user.skillsToTeach.map(skill => ({
+			name: skill.skillId.name,
+			level: skill.proficiencyLevel,
+			rating: user.stats.averageRating || 0
+		})),
+		availability: user.availability.map(slot => 
+			slot.slots.map(time => {
+				const hour = parseInt(time.startTime.split(':')[0]);
+				if (hour >= 8 && hour < 12) return 'Morning';
+				if (hour >= 12 && hour < 16) return 'Afternoon';
+				if (hour >= 16 && hour < 20) return 'Evening';
+				return 'Night';
+			})
+		).flat(),
+		languages: user.profile.languages,
+		location: "Not specified", // Add location to user profile if needed
+		rating: user.stats.averageRating || 0,
+		totalReviews: user.stats.totalReviews,
+		teachingHours: user.stats.totalTeachingHours
+	});
 
+	// Replace the searchResults with transformed user data
+	const displayResults = users?.map(transformUserData) || [];
 
 	const sortOptions = [
 		{ value: 'match', label: 'Best Match' },
@@ -390,7 +287,7 @@ const SkillMatching = () => {
 					<div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
 						<div className="flex items-center justify-between">
 							<p className="text-sm text-gray-600">
-								Showing <span className="font-medium">67</span> results
+								Showing <span className="font-medium">{displayResults.length}</span> results
 							</p>
 							<div className="flex items-center space-x-4">
 								<select
@@ -410,7 +307,7 @@ const SkillMatching = () => {
 
 					{/* Results Grid */}
 					<div className="space-y-4">
-						{searchResults.map(result => (
+						{displayResults.map(result => (
 							<div
 								key={result.id}
 								className="bg-white rounded-xl border border-gray-100 p-6 hover:border-blue-100 transition-colors"
@@ -520,7 +417,7 @@ const SkillMatching = () => {
 			</div>
 
 			{/* No Results State */}
-			{searchResults.length === 0 && (
+			{displayResults.length === 0 && (
 				<div className="flex flex-col items-center justify-center py-12">
 					<div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
 						<Search className="w-8 h-8 text-blue-500" />

@@ -1,8 +1,8 @@
 import { useSelector, useDispatch } from "react-redux";
-import { getMyProfile } from "../store/slices/userSlice";
+import { getMyProfile, getUsersData } from "../store/slices/userSlice";
 
 export const useUser = () => {
-  const { user, loading, error } = useSelector((state) => state.user);
+  const { user, users, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const getUser = async () => {
@@ -13,5 +13,13 @@ export const useUser = () => {
     }
   };
 
-  return { user, loading, error, getUser };
+  const getUsers = async () => {
+    try {
+      await dispatch(getUsersData());
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  return { user, users, loading, error, getUser, getUsers };
 };

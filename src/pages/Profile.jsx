@@ -35,11 +35,9 @@ const Profile = () => {
 		}
 	}, [isOwnProfile]);
 
-	console.log("user", user);
-
 	// Sample data - Replace with real data
 	const userProfile = {
-		name: user.profile.firstName + ' ' + user.profile.lastName,
+		name: user?.profile?.firstName + ' ' + user?.profile?.lastName,
 		university: 'Stanford University',
 		course: 'Computer Science',
 		year: '3rd Year',
@@ -49,7 +47,7 @@ const Profile = () => {
 		teachingHours: 48,
 		rating: 4.8,
 		totalReviews: 32,
-		bio: user.profile.bio,
+		bio: user?.profile?.bio,
 		languages: ['English (Native)', 'Spanish (Intermediate)', 'Mandarin (Beginner)'],
 		availability: [
 			{ day: 'Monday', slots: ['2:00 PM - 4:00 PM', '7:00 PM - 9:00 PM'] },
