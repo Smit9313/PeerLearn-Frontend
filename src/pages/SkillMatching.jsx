@@ -26,6 +26,8 @@ const SkillMatching = () => {
 	});
 	const [sortBy, setSortBy] = useState('match');
 	const [showFilters, setShowFilters] = useState(true);
+	const [sentRequests, setSentRequests] = useState(new Set());
+	const [selectedUser, setSelectedUser] = useState(null);
 
 	// Sample data
 	const skillCategories = [
@@ -224,6 +226,16 @@ const SkillMatching = () => {
 			languages: [],
 			location: 'any',
 		});
+	};
+
+	const handleRequestSession = (teacherId) => {
+		setSentRequests(prev => new Set([...prev, teacherId]));
+		setSelectedUser(null); // Close popup after request
+		// Here you would typically make an API call to send the request
+	};
+
+	const openRequestPopup = (user) => {
+		setSelectedUser(user);
 	};
 
 	return (
@@ -455,15 +467,21 @@ const SkillMatching = () => {
 								</div>
 
 								{/* Actions */}
-								<div className="mt-6 flex items-center justify-end space-x-3">
-									<Button variant="outline">
-										<MessageSquare className="w-4 h-4 mr-2" />
-										Message
-									</Button>
-									<Button variant="primary">
-										<Calendar className="w-4 h-4 mr-2" />
-										Schedule Session
-									</Button>
+								<div className="mt-6 flex items-center justify-end">
+									{sentRequests.has(result.id) ? (
+										<div className="flex items-center text-sm text-gray-600">
+											<Clock className="w-4 h-4 mr-2" />
+											Request Pending
+										</div>
+									) : (
+										<Button 
+											variant="primary"
+											onClick={() => openRequestPopup(result)}
+										>
+											<Calendar className="w-4 h-4 mr-2" />
+											Request Session
+										</Button>
+									)}
 								</div>
 							</div>
 						))}
@@ -549,6 +567,70 @@ const SkillMatching = () => {
 										</Button>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Add Session Request Popup */}
+			{selectedUser && (
+				<div className="fixed inset-0 z-50 overflow-y-auto">
+					<div className="flex items-center justify-center min-h-screen px-4">
+						<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedUser(null)} />
+						<div className="relative bg-white rounded-xl max-w-lg w-full p-6 z-10">
+							<button 
+								onClick={() => setSelectedUser(null)}
+								className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+							>
+								<X className="w-6 h-6" />
+							</button>
+
+							<div className="flex items-center mb-6">
+								<div className="w-16 h-16 bg-gray-200 rounded-full" />
+								<div className="ml-4">
+									<h3 className="text-xl font-medium text-gray-900">{selectedUser.name}</h3>
+									<p className="text-sm text-gray-600">{selectedUser.university}</p>
+								</div>
+							</div>
+
+							<div className="space-y-4 mb-6">
+								<div>
+									<h4 className="text-sm font-medium text-gray-900 mb-2">Skills</h4>
+									<div className="flex flex-wrap gap-2">
+										{selectedUser.skills.map(skill => (
+											<span key={skill.name} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
+												{skill.name} • {skill.level} • {skill.rating} <Star className="w-3 h-3 text-yellow-400 ml-1" />
+											</span>
+										))}
+									</div>
+								</div>
+
+								<div>
+									<h4 className="text-sm font-medium text-gray-900 mb-2">Availability</h4>
+									<p className="text-sm text-gray-600">{selectedUser.availability.join(', ')}</p>
+								</div>
+
+								<div>
+									<h4 className="text-sm font-medium text-gray-900 mb-2">Teaching Experience</h4>
+									<p className="text-sm text-gray-600">{selectedUser.teachingHours} hours taught • {selectedUser.totalReviews} reviews</p>
+								</div>
+							</div>
+
+							<div className="flex justify-end space-x-3">
+								<Button 
+									variant="outline" 
+									onClick={() => setSelectedUser(null)}
+								>
+									Cancel
+								</Button>
+								<Button 
+									variant="primary"
+									onClick={() => handleRequestSession(selectedUser.id)}
+								>
+									<Calendar className="w-4 h-4 mr-2" />
+									Request Session
+								</Button>
 							</div>
 						</div>
 					</div>
