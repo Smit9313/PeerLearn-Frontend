@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { store } from '../store';
-import { setError } from '../store/slices/authSlice';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 

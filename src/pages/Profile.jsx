@@ -15,20 +15,31 @@ import {
 	ExternalLink,
 	Heart, ThumbsUp, Filter, ChevronDown
 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useUser } from '../hooks/useUser';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/common/Button';
 
 const Profile = () => {
 	const { userId } = useParams();
+	const { user, getUser } = useUser();
 	const [selectedFilter, setSelectedFilter] = useState('all');
 	const [sortBy, setSortBy] = useState('recent');
 
 	const [activeTab, setActiveTab] = useState('overview');
 	const isOwnProfile = !userId;
 
+	useEffect(() => {
+		if (isOwnProfile) {
+			getUser();
+		}
+	}, [isOwnProfile]);
+
+	console.log("user", user);
+
 	// Sample data - Replace with real data
 	const userProfile = {
-		name: 'John Doe',
+		name: user.profile.firstName + ' ' + user.profile.lastName,
 		university: 'Stanford University',
 		course: 'Computer Science',
 		year: '3rd Year',
@@ -38,7 +49,7 @@ const Profile = () => {
 		teachingHours: 48,
 		rating: 4.8,
 		totalReviews: 32,
-		bio: 'Computer Science student passionate about teaching programming and learning new languages. Always excited to collaborate and help fellow students!',
+		bio: user.profile.bio,
 		languages: ['English (Native)', 'Spanish (Intermediate)', 'Mandarin (Beginner)'],
 		availability: [
 			{ day: 'Monday', slots: ['2:00 PM - 4:00 PM', '7:00 PM - 9:00 PM'] },

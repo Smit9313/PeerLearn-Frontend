@@ -38,7 +38,7 @@ export const signupSchema = yup.object({
   // Step 3: Settings
   settings: yup.object({
     language: yup.string().default('en'),
-    timezone: yup.string().required('Timezone is required'),
+    timezone: yup.string(),
   }),
 
   // Step 4: Skills
