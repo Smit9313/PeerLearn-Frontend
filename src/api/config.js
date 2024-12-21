@@ -29,10 +29,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || 'Something went wrong';
-    store.dispatch(setError(message));
+    console.log(error);
     
-    if (error.response?.status === 401) {
+    if (error.response?.status === 400) {
+			console.log("Unauthorized");
       // Handle unauthorized access
       store.dispatch(logout());
     }

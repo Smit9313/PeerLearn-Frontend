@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 
 const Login = () => {
 	const navigate = useNavigate();
-	const { userLogin, loading, error } = useAuth();
+	const { showToast } = useToast();
+	const { userLogin, loading, loginError: error } = useAuth();
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -22,21 +24,32 @@ const Login = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		
-		// Disable form while submitting
+
 		if (loading) return;
 
 		try {
 			const success = await userLogin(formData);
 			if (success) {
-				// Save to localStorage if "Remember me" is checked
 				if (formData.rememberMe) {
 					localStorage.setItem('email', formData.email);
 				}
-				navigate('/dashboard'); // or your desired redirect path
+				showToast({
+					message: 'Login successful!',
+					type: 'success'
+				});
+				navigate('/dashboard');
+			} else {
+				showToast({
+					message: 'Login failed. Please try again.',
+					type: 'error'
+				});
 			}
 		} catch (err) {
-			console.error('Login failed:', err);
+			console.log("err", err);
+			showToast({
+				message: err?.message || 'Login failed. Please try again.',
+				type: 'error'
+			});
 		}
 	};
 
@@ -135,9 +148,9 @@ const Login = () => {
 						</div>
 
 						<div>
-							<Button 
-								type="submit" 
-								variant="primary" 
+							<Button
+								type="submit"
+								variant="primary"
 								className="w-full"
 								disabled={loading}
 							>

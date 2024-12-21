@@ -8,8 +8,10 @@ import SettingsStep from './steps/SettingsStep';
 import SkillsStep from './steps/SkillsStep';
 import AvailabilityStep from './steps/AvailabilityStep';
 import StepIndicator from '../../components/StepIndicator';
+import { useAuth } from '../../hooks/useAuth';
 
 const SignUp = () => {
+	const { userRegister, loading, registerError : error } = useAuth();
 	const [currentStep, setCurrentStep] = useState(1);
 	const totalSteps = 5;
 
@@ -26,9 +28,13 @@ const SignUp = () => {
 
 	const { handleSubmit, trigger } = methods;
 
-	const onSubmit = (data) => {
+	const onSubmit = async (data) => {
 		console.log('Form submitted:', data);
 		// Send data to backend
+		const success = await userRegister(data);
+		if (success) {
+			navigate('/');
+		}
 	};
 
 	const nextStep = async () => {

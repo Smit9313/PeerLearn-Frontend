@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser, logout } from "../store/slices/authSlice";
+import { loginUser, logout, registerUser } from "../store/slices/authSlice";
 
 export const useAuth = () => {
   const { user, isAuthenticated, loading, error } = useSelector((state) => state.auth);
@@ -14,6 +14,15 @@ export const useAuth = () => {
     }
   };
 
+  const userRegister = async (userData) => {
+    try {
+      await dispatch(registerUser(userData)).unwrap();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const userLogout = () => {
     localStorage.removeItem('token');
     dispatch(logout());
@@ -22,6 +31,7 @@ export const useAuth = () => {
   return {
     user,
     userLogin,
+    userRegister,
     userLogout,
     isAuthenticated,
     loading,

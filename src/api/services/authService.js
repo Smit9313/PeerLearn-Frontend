@@ -7,22 +7,22 @@ export const authService = {
   },
   
   register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
+    const response = await api.post('/api/auth/signup', userData);
     return response.data;
   },
   
   logout: async () => {
-    const response = await api.post('/auth/logout');
+    const response = await api.post('/api/auth/logout');
     return response.data;
   },
   
   getCurrentUser: async () => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/api/auth/me');
     return response.data;
   },
   
   refreshToken: async () => {
-    const response = await api.post('/auth/refresh-token');
+    const response = await api.post('/api/auth/refresh-token');
     return response.data;
   }
 }; 
