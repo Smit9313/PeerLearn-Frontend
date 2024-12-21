@@ -9,8 +9,10 @@ import SkillsStep from './steps/SkillsStep';
 import AvailabilityStep from './steps/AvailabilityStep';
 import StepIndicator from '../../components/StepIndicator';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+	const navigate = useNavigate();
 	const { userRegister, loading, registerError : error } = useAuth();
 	const [currentStep, setCurrentStep] = useState(1);
 	const totalSteps = 5;
@@ -33,7 +35,7 @@ const SignUp = () => {
 		// Send data to backend
 		const success = await userRegister(data);
 		if (success) {
-			navigate('/');
+			navigate('/login');
 		}
 	};
 

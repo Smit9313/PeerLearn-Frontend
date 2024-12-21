@@ -19,6 +19,10 @@ export const signupSchema = yup.object({
     phoneNumber: yup.string()
       .matches(/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'),
     avatar: yup.string().url('Please enter a valid URL'),
+    languages: yup.array()
+      .of(yup.string())
+      .min(1, 'Please select at least one language')
+      .required('Languages are required'),
   }),
 
   // Step 2: Academic Info
@@ -34,7 +38,7 @@ export const signupSchema = yup.object({
   // Step 3: Settings
   settings: yup.object({
     language: yup.string().default('en'),
-    timezone: yup.string(),
+    timezone: yup.string().required('Timezone is required'),
   }),
 
   // Step 4: Skills
@@ -76,4 +80,4 @@ export const signupSchema = yup.object({
       ),
     })
   ),
-}); 
+});
