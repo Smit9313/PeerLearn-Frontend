@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
-	const { userLogin } = useAuth();
+	const navigate = useNavigate();
+	const { userLogin, loading, error } = useAuth();
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -13,18 +14,30 @@ const Login = () => {
 	});
 
 	const [showPassword, setShowPassword] = useState(false);
-	const [error, setError] = useState('');
 
 	const handleChange = (e) => {
 		const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
 		setFormData({ ...formData, [e.target.name]: value });
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// Handle login logic
-		userLogin(formData);
-		console.log('Form submitted:', formData);
+		
+		// Disable form while submitting
+		if (loading) return;
+
+		try {
+			const success = await userLogin(formData);
+			if (success) {
+				// Save to localStorage if "Remember me" is checked
+				if (formData.rememberMe) {
+					localStorage.setItem('email', formData.email);
+				}
+				navigate('/dashboard'); // or your desired redirect path
+			}
+		} catch (err) {
+			console.error('Login failed:', err);
+		}
 	};
 
 	return (
@@ -122,8 +135,13 @@ const Login = () => {
 						</div>
 
 						<div>
-							<Button type="submit" variant="primary" className="w-full">
-								Sign in
+							<Button 
+								type="submit" 
+								variant="primary" 
+								className="w-full"
+								disabled={loading}
+							>
+								{loading ? 'Signing in...' : 'Sign in'}
 							</Button>
 						</div>
 					</form>
