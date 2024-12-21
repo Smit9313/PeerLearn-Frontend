@@ -28,6 +28,12 @@ const SkillMatching = () => {
 	const [showFilters, setShowFilters] = useState(true);
 	const [sentRequests, setSentRequests] = useState(new Set());
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [sessionRequest, setSessionRequest] = useState({
+		date: '',
+		time: '',
+		duration: '60',
+		notes: ''
+	});
 
 	// Sample data
 	const skillCategories = [
@@ -230,8 +236,9 @@ const SkillMatching = () => {
 
 	const handleRequestSession = (teacherId) => {
 		setSentRequests(prev => new Set([...prev, teacherId]));
-		setSelectedUser(null); // Close popup after request
-		// Here you would typically make an API call to send the request
+		console.log('Session Request:', { teacherId, ...sessionRequest });
+		setSelectedUser(null);
+		setSessionRequest({ date: '', time: '', duration: '60', notes: '' });
 	};
 
 	const openRequestPopup = (user) => {
@@ -578,59 +585,178 @@ const SkillMatching = () => {
 				<div className="fixed inset-0 z-50 overflow-y-auto">
 					<div className="flex items-center justify-center min-h-screen px-4">
 						<div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedUser(null)} />
-						<div className="relative bg-white rounded-xl max-w-lg w-full p-6 z-10">
+						<div className="relative bg-white rounded-xl max-w-4xl w-full z-10 overflow-hidden">
+							{/* Close Button */}
 							<button 
 								onClick={() => setSelectedUser(null)}
-								className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+								className="absolute top-4 right-4 text-gray-400 hover:text-gray-500 z-10"
 							>
-								<X className="w-6 h-6" />
+								<X className="w-5 h-5" />
 							</button>
 
-							<div className="flex items-center mb-6">
-								<div className="w-16 h-16 bg-gray-200 rounded-full" />
-								<div className="ml-4">
-									<h3 className="text-xl font-medium text-gray-900">{selectedUser.name}</h3>
-									<p className="text-sm text-gray-600">{selectedUser.university}</p>
-								</div>
-							</div>
+							<div className="flex flex-col h-full">
+								<div className="flex flex-1">
+									{/* Left Column - Profile Details */}
+									<div className="w-1/2 p-6 border-r border-gray-100">
+										{/* User Header */}
+										<div className="flex items-center mb-6">
+											<div className="w-16 h-16 bg-gray-200 rounded-full" />
+											<div className="ml-4">
+												<h3 className="text-xl font-semibold text-gray-900">{selectedUser.name}</h3>
+												<p className="text-sm text-gray-600">{selectedUser.university}</p>
+											</div>
+										</div>
 
-							<div className="space-y-4 mb-6">
-								<div>
-									<h4 className="text-sm font-medium text-gray-900 mb-2">Skills</h4>
-									<div className="flex flex-wrap gap-2">
-										{selectedUser.skills.map(skill => (
-											<span key={skill.name} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
-												{skill.name} • {skill.level} • {skill.rating} <Star className="w-3 h-3 text-yellow-400 ml-1" />
-											</span>
-										))}
+										{/* Skills Section */}
+										<div className="mb-6">
+											<h4 className="text-sm font-medium text-gray-900 mb-3">Teaching Skills</h4>
+											<div className="space-y-2">
+												{selectedUser.skills.map(skill => (
+													<div 
+														key={skill.name} 
+														className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+													>
+														<span className="text-sm text-gray-700">{skill.name}</span>
+														<div className="flex items-center space-x-2">
+															<span className="text-sm text-gray-500">{skill.level}</span>
+															<div className="flex items-center text-sm">
+																<span className="font-medium text-gray-700">{skill.rating}</span>
+																<Star className="w-4 h-4 text-yellow-400 ml-1" />
+															</div>
+														</div>
+													</div>
+												))}
+											</div>
+										</div>
+
+										{/* Availability Section */}
+										<div className="mb-6">
+											<h4 className="text-sm font-medium text-gray-900 mb-3">Available Times</h4>
+											<div className="grid grid-cols-1 gap-2">
+												{selectedUser.availability.map((time, index) => (
+													<div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
+														<Clock className="w-4 h-4 text-gray-400 mr-3" />
+														<span className="text-sm text-gray-700">
+															{time === 'Morning' && '8 AM - 12 PM'}
+															{time === 'Afternoon' && '12 PM - 4 PM'}
+															{time === 'Evening' && '4 PM - 8 PM'}
+															{time === 'Night' && '8 PM - 12 AM'}
+														</span>
+													</div>
+												))}
+											</div>
+										</div>
+
+										{/* Teaching Experience */}
+										<div>
+											<h4 className="text-sm font-medium text-gray-900 mb-3">Teaching Experience</h4>
+											<div className="grid grid-cols-2 gap-4">
+												<div className="p-3 bg-gray-50 rounded-lg">
+													<div className="text-2xl font-semibold text-gray-900">{selectedUser.teachingHours}</div>
+													<div className="text-sm text-gray-600">Hours taught</div>
+												</div>
+												<div className="p-3 bg-gray-50 rounded-lg">
+													<div className="text-2xl font-semibold text-gray-900">{selectedUser.totalReviews}</div>
+													<div className="text-sm text-gray-600">Reviews</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									{/* Right Column - Session Proposal */}
+									<div className="w-1/2 p-6 bg-gray-50">
+										<h3 className="text-lg font-semibold text-gray-900 mb-6">Request Study Session</h3>
+										
+										<div className="space-y-5">
+											{/* Date and Time */}
+											<div className="grid grid-cols-2 gap-4">
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														Date
+													</label>
+													<input
+														type="date"
+														value={sessionRequest.date}
+														onChange={(e) => setSessionRequest(prev => ({...prev, date: e.target.value}))}
+														className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+														min={new Date().toISOString().split('T')[0]}
+													/>
+												</div>
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														Time
+													</label>
+													<input
+														type="time"
+														value={sessionRequest.time}
+														onChange={(e) => setSessionRequest(prev => ({...prev, time: e.target.value}))}
+														className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+													/>
+												</div>
+											</div>
+
+											{/* Session Duration */}
+											<div>
+												<label className="block text-sm font-medium text-gray-700 mb-1">
+													Session Duration
+												</label>
+												<select
+													value={sessionRequest.duration}
+													onChange={(e) => setSessionRequest(prev => ({...prev, duration: e.target.value}))}
+													className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+												>
+													<option value="30">30 minutes</option>
+													<option value="60">1 hour</option>
+													<option value="90">1.5 hours</option>
+													<option value="120">2 hours</option>
+												</select>
+											</div>
+
+											{/* Additional Notes */}
+											<div>
+												<label className="block text-sm font-medium text-gray-700 mb-1">
+													Additional Notes (Optional)
+												</label>
+												<textarea
+													value={sessionRequest.notes}
+													onChange={(e) => setSessionRequest(prev => ({...prev, notes: e.target.value}))}
+													rows={4}
+													className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+														placeholder="Add any specific topics or questions you'd like to cover..."
+												/>
+											</div>
+										</div>
 									</div>
 								</div>
 
-								<div>
-									<h4 className="text-sm font-medium text-gray-900 mb-2">Availability</h4>
-									<p className="text-sm text-gray-600">{selectedUser.availability.join(', ')}</p>
+								{/* Action Buttons - Now at the bottom */}
+								<div className="border-t border-gray-100 px-6 py-4 bg-white">
+									<div className="flex justify-end space-x-3">
+										<button
+											onClick={() => {
+												setSelectedUser(null);
+												setSessionRequest({ date: '', time: '', duration: '60', notes: '' });
+											}}
+											className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-800"
+										>
+											Cancel
+										</button>
+										<button
+											onClick={() => handleRequestSession(selectedUser.id)}
+											disabled={!sessionRequest.date || !sessionRequest.time}
+											className={`
+												px-6 py-2 rounded-lg text-sm font-medium text-white
+												flex items-center
+												${!sessionRequest.date || !sessionRequest.time 
+													? 'bg-blue-400 cursor-not-allowed' 
+													: 'bg-blue-600 hover:bg-blue-700'}
+											`}
+										>
+											<Calendar className="w-4 h-4 mr-2" />
+											Request Session
+										</button>
+									</div>
 								</div>
-
-								<div>
-									<h4 className="text-sm font-medium text-gray-900 mb-2">Teaching Experience</h4>
-									<p className="text-sm text-gray-600">{selectedUser.teachingHours} hours taught • {selectedUser.totalReviews} reviews</p>
-								</div>
-							</div>
-
-							<div className="flex justify-end space-x-3">
-								<Button 
-									variant="outline" 
-									onClick={() => setSelectedUser(null)}
-								>
-									Cancel
-								</Button>
-								<Button 
-									variant="primary"
-									onClick={() => handleRequestSession(selectedUser.id)}
-								>
-									<Calendar className="w-4 h-4 mr-2" />
-									Request Session
-								</Button>
 							</div>
 						</div>
 					</div>
