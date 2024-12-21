@@ -15,6 +15,7 @@ import PageWrapper from '../../components/layout/PageWrapper';
 import Button from '../../components/common/Button';
 import ActiveSession from './ActiveSession';
 import ScheduleSession from './ScheduleSession';
+import SessionRequests from './SessionRequests';
 
 const SessionsPage = () => {
 	const location = useLocation();
@@ -23,17 +24,13 @@ const SessionsPage = () => {
 	const tabs = [
 		{ id: 'upcoming', label: 'Upcoming', count: 3 },
 		{ id: 'active', label: 'Active Now', count: 1 },
+		{ id: 'requests', label: 'Requests', count: 3 },
 		{ id: 'completed', label: 'Completed', count: 24 },
 	];
 
 	return (
 		<PageWrapper
 			title="Sessions"
-			actions={
-				<Button variant="primary">
-					Schedule New Session
-				</Button>
-			}
 			className="p-4"
 		>
 			{/* Tabs Navigation */}
@@ -69,12 +66,17 @@ const SessionsPage = () => {
 				</div>
 			</div>
 
-			<Routes>
-				<Route path="/" element={<SessionsList activeTab={activeTab} />} />
-				<Route path="/schedule" element={<ScheduleSession />} />
-				<Route path="/active/:id" element={<ActiveSession />} />
-				<Route path="/history" element={<SessionHistory />} />
-			</Routes>
+			{/* Content */}
+			{activeTab === 'requests' ? (
+				<SessionRequests />
+			) : (
+				<Routes>
+					<Route path="/" element={<SessionsList activeTab={activeTab} />} />
+					<Route path="/schedule" element={<ScheduleSession />} />
+					<Route path="/active/:id" element={<ActiveSession />} />
+					<Route path="/history" element={<SessionHistory />} />
+				</Routes>
+			)}
 		</PageWrapper>
 	);
 };
@@ -224,7 +226,7 @@ const SessionsList = ({ activeTab }) => {
 	};
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4 max-w-5xl">
 			{sessions[activeTab].map(renderSession)}
 		</div>
 	);
